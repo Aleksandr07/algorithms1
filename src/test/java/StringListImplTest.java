@@ -39,12 +39,12 @@ class StringListImplTest {
     void shouldAddItemWithIndex() {
         stringList.add("1");
         stringList.add("2");
-        stringList.add(1, "23");
+        stringList.add(0, "23");
         stringList.add("3");
         String expected = "23";
-        String[] expectedArray = {"1", "23", "2", "3"};
+        String[] expectedArray = {"23", "1", "2", "3"};
         assertArrayEquals(expectedArray, stringList.toArray());
-        assertEquals(expected, stringList.get(1));
+        assertEquals(expected, stringList.get(0));
     }
 
     @Test
@@ -99,7 +99,7 @@ class StringListImplTest {
     void shouldThrowElementNotFoundException() {
         stringList.add("1");
         assertThrows(ElementNotFoundException.class, () -> stringList.remove("5"));
-        assertThrows(ElementNotFoundException.class, () -> stringList.remove(4));
+         assertThrows(ElementNotFoundException.class, () -> stringList.remove(4));
     }
 
     @Test

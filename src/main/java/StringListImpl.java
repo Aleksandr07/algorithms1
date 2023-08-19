@@ -8,7 +8,7 @@ public class StringListImpl implements StringList{
 
     private final String[] stringListStorage;
 
-    private int count = 0;
+    private int size = 0;
     public StringListImpl(int size) {
         stringListStorage = new String[size];
     }
@@ -16,32 +16,29 @@ public class StringListImpl implements StringList{
     @Override
     public String add(String item) {
         inputValidate(item);
-        if (count == stringListStorage.length) {
+        if (size == stringListStorage.length) {
             throw new StringListOutOfBoundsException("Превышен размер массива");
         }
-        stringListStorage[count] = item;
-        count++;
-        return stringListStorage[count - 1];
+        stringListStorage[size++] = item;
+        return stringListStorage[size - 1];
     }
 
     @Override
     public String add(int index, String item) {
         inputValidate(item);
-        if (index == stringListStorage.length || index > count-1) {
+        if (index == stringListStorage.length || index > size -1) {
             throw new StringListOutOfBoundsException("Превышен размер массива");
         }
-        for (int i = count-1; i >= index; i--) {
-                stringListStorage[i+1] = stringListStorage[i];
-        }
-        count++;
-        stringListStorage[index] = item;
+        System.arraycopy(stringListStorage, index, stringListStorage, index + 1, size - index );
+         stringListStorage[index] = item;
+        size++;
         return stringListStorage[index];
     }
 
     @Override
     public String set(int index, String item) {
         inputValidate(item);
-        if (index == stringListStorage.length || index > count-1) {
+        if (index == stringListStorage.length || index > size -1) {
             throw new StringListOutOfBoundsException("Превышен размер массива");
         }
         stringListStorage[index] = item;
@@ -50,77 +47,61 @@ public class StringListImpl implements StringList{
 
     @Override
     public String remove(String item) {
-        int index = -1;
-        String deletedElement = null;
-        for (int i = 0; i < count-1; i++) {
-            if (stringListStorage[i].equals(item)) {
-                index = i;
-                deletedElement = stringListStorage[i];
-                break;
-            }
-        }
+        int index = indexOf(item);
         if (index == -1) {
             throw new ElementNotFoundException("Элемент массива не найден");
         }
-        for (int i = index; i < count-1; i++) {
-            stringListStorage[i] = stringListStorage[i + 1];
+
+        if (index != size) {
+            System.arraycopy(stringListStorage, index + 1, stringListStorage, index, size - index);
         }
-        count--;
-        return deletedElement;
+        size--;
+
+        return item;
     }
 
     @Override
     public String remove(int index) {
-        if (index > count-1) {
+        if (index > size -1) {
             throw new ElementNotFoundException("Элемент массива не найден");
         }
-        String deletedElement = stringListStorage[index];
-        for (int i = index; i < count-1; i++) {
-            stringListStorage[i] = stringListStorage[i + 1];
+        String item = stringListStorage[index];
+        if (index != size) {
+            System.arraycopy(stringListStorage, index + 1, stringListStorage, index, size - index);
         }
-        count--;
-        return deletedElement;
+        size--;
+
+        return item;
     }
 
     @Override
     public boolean contains(String item) {
-        boolean isContains = false;
-        for (int i = 0; i < count-1; i++) {
-            if (stringListStorage[i].equals(item)) {
-                isContains = true;
-                break;
-            }
-        }
-        return isContains;
+        return indexOf(item) != -1;
     }
 
     @Override
     public int indexOf(String item) {
-        int findElementIndex = -1;
-        for (int i = 0; i < count-1; i++) {
+        for (int i = 0; i < size; i++) {
             if (stringListStorage[i].equals(item)) {
-                findElementIndex = i;
-                break;
+                return i;
             }
         }
-        return findElementIndex;
+        return -1;
     }
 
     @Override
     public int lastIndexOf(String item) {
-        int index = -1;
-        for (int i = count-1; i >= 0; i--) {
+        for (int i = size - 1; i >= 0; i--) {
             if (stringListStorage[i].equals(item)) {
-                index = i;
-                break;
-            }
+                return i;
+                            }
         }
-        return index;
+        return -1;
     }
 
     @Override
     public String get(int index) {
-        if (index > stringListStorage.length || index > count-1) {
+        if (index > stringListStorage.length || index > size -1) {
             throw new StringListOutOfBoundsException("Превышен размер массива");
         }
         return stringListStorage[index];
@@ -128,40 +109,27 @@ public class StringListImpl implements StringList{
 
     @Override
     public boolean equals(StringList otherList) {
-        boolean isEquals = true;
-        if (size() != otherList.size()) {
-            isEquals = false;
-        } else {
-            for (int i = 0; i < count-1; i++) {
-                if (!(stringListStorage[i].equals(otherList.get(i)))) {
-                    isEquals = false;
-                }
-            }
-        }
-        return isEquals;
+        return Arrays.equals(toArray(), otherList.toArray());
     }
 
     @Override
     public int size() {
-        return count;
+        return size;
     }
 
     @Override
     public boolean isEmpty() {
-        return count == 0;
+        return size == 0;
     }
 
     @Override
     public void clear() {
-        for (int i = 0; i <= count-1; i++) {
-            stringListStorage[i] = null;
-        }
-        count = 0;
+        size = 0;
     }
 
     @Override
     public String[] toArray() {
-        return Arrays.copyOf(stringListStorage, count);
+        return Arrays.copyOf(stringListStorage, size);
     }
 
     private void inputValidate(String item) {
