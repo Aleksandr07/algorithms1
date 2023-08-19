@@ -76,7 +76,8 @@ public class IntegerListImpl implements IntegerList{
 
     @Override
     public boolean contains(Integer item) {
-        Integer[] arr = Arrays.copyOf(integerListStorage, size);
+        Integer[] arr = toArray();
+        sortInsertion(arr);
         int min = 0;
         int max = arr.length - 1;
 
