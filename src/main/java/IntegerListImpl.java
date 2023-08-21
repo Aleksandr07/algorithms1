@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class IntegerListImpl implements IntegerList{
 
-    private final Integer[] integerListStorage;
+    private Integer[] integerListStorage;
 
     private int size = 0;
     public IntegerListImpl(int size) {
@@ -17,7 +17,7 @@ public class IntegerListImpl implements IntegerList{
     public Integer add(Integer item) {
         inputValidate(item);
         if (size == integerListStorage.length) {
-            throw new StringListOutOfBoundsException("Превышен размер массива");
+            integerListStorage = grow(integerListStorage);
         }
         integerListStorage[size++] = item;
         return integerListStorage[size - 1];
@@ -26,7 +26,10 @@ public class IntegerListImpl implements IntegerList{
     @Override
     public Integer add(int index, Integer item) {
         inputValidate(item);
-        if (index == integerListStorage.length || index > size -1) {
+        if (size == integerListStorage.length) {
+            integerListStorage = grow(integerListStorage);
+        }
+        if (index > size -1) {
             throw new StringListOutOfBoundsException("Превышен размер массива");
         }
         System.arraycopy(integerListStorage, index, integerListStorage, index + 1, size - index );
@@ -77,7 +80,7 @@ public class IntegerListImpl implements IntegerList{
     @Override
     public boolean contains(Integer item) {
         Integer[] arr = toArray();
-        sortInsertion(arr);
+        mergeSort(arr);
         int min = 0;
         int max = arr.length - 1;
 
@@ -156,15 +159,49 @@ public class IntegerListImpl implements IntegerList{
         }
     }
 
-    private void sortInsertion(Integer[] arr) {
-        for (int i = 1; i < arr.length; i++) {
-            int temp = arr[i];
-            int j = i;
-            while (j > 0 && arr[j - 1] >= temp) {
-                arr[j] = arr[j - 1];
-                j--;
-            }
-            arr[j] = temp;
+    private void mergeSort(Integer[] arr) {
+        if (arr.length < 2) {
+            return;
         }
+        int mid = arr.length / 2;
+        Integer[] left = new Integer[mid];
+        Integer[] right = new Integer[arr.length - mid];
+
+        for (int i = 0; i < left.length; i++) {
+            left[i] = arr[i];
+        }
+
+        for (int i = 0; i < right.length; i++) {
+            right[i] = arr[mid + i];
+        }
+
+        mergeSort(left);
+        mergeSort(right);
+
+        merge(arr, left, right);
+    }
+
+    private static void merge(Integer[] arr, Integer[] left, Integer[] right) {
+
+        int mainP = 0;
+        int leftP = 0;
+        int rightP = 0;
+        while (leftP < left.length && rightP < right.length) {
+            if (left[leftP] <= right[rightP]) {
+                arr[mainP++] = left[leftP++];
+            } else {
+                arr[mainP++] = right[rightP++];
+            }
+        }
+        while (leftP < left.length) {
+            arr[mainP++] = left[leftP++];
+        }
+        while (rightP < right.length) {
+            arr[mainP++] = right[rightP++];
+        }
+    }
+
+    private Integer[] grow(Integer[] arr) {
+        return Arrays.copyOf(arr, (int) (arr.length * 1.5));
     }
 }
