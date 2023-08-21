@@ -24,13 +24,14 @@ public class IntegerListImplTest {
     }
 
     @Test
-    void shouldThrowStringListOutOfBoundException() {
+    void shouldGrowSize() {
         integerList.add(1);
         integerList.add(1);
         integerList.add(1);
         integerList.add(1);
         integerList.add(1);
-        assertThrows(StringListOutOfBoundsException.class, () -> integerList.add(1));
+        assertEquals(1, integerList.add(1));
+        assertTrue(integerList.size() > 5);
     }
 
 
